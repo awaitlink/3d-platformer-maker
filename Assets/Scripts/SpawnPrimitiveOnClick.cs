@@ -17,9 +17,14 @@ public class SpawnPrimitiveOnClick : MonoBehaviour {
         GameObject newObject = GameObject.CreatePrimitive(spawnedPrimitiveType);
 
         newObject.transform.SetParent(parent);
-        newObject.transform.position = Vector3.zero;
-        newObject.transform.rotation = Quaternion.identity;
         newObject.GetComponent<Renderer>().material.color = Color.blue;
+
+        GameObject last = GameObjectsManager.lastSelectedObject;
+        if (last != null)
+        {
+            newObject.transform.position = last.transform.position + new Vector3(2, 0, 0);
+            newObject.transform.rotation = last.transform.rotation;
+        }
 
         GameObjectsManager.lastSelectedObject = newObject;
     }

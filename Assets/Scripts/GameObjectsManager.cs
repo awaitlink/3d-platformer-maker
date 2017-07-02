@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 public class GameObjectsManager : MonoBehaviour {
 
@@ -14,6 +12,15 @@ public class GameObjectsManager : MonoBehaviour {
         }
     }
 
+    public void DeleteCurrent()
+    {
+        if (lastSelectedObject.transform.parent.name != "DontDelete")
+        {
+            Destroy(lastSelectedObject);
+            lastSelectedObject = null;
+        }
+    }
+
     GameObject GetSelectedObject()
     {
         Ray interactionRay = Camera.main.ScreenPointToRay(Input.mousePosition);
@@ -22,7 +29,7 @@ public class GameObjectsManager : MonoBehaviour {
         {
             return interactionInfo.collider.gameObject;
         }
-        return null;
+        return lastSelectedObject;
     }
 
 }
