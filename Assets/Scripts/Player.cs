@@ -5,6 +5,8 @@ public class Player : MonoBehaviour {
     public float speed = 5f;
     public float jumpSpeed = 10f;
 
+    public LayerMask ground;
+
     private float distToGround;
 
     private Rigidbody rb;
@@ -33,7 +35,7 @@ public class Player : MonoBehaviour {
     }
 
     private bool IsGrounded(){
-        return Physics.Raycast(transform.position, -Vector3.up, distToGround + 0.1f);
+        return Physics.Raycast(transform.position, -Vector3.up, distToGround + 0.1f, ground);
     } 
 
 }

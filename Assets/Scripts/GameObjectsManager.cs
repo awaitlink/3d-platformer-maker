@@ -7,6 +7,13 @@ public class GameObjectsManager : MonoBehaviour {
 
     public Text objectNameText;
 
+    [Header("Base Objects")]
+    public GameObject player;
+    public GameObject playerTop;
+    public GameObject finish;
+    public GameObject finishTop;
+    public GameObject fall;
+
     [HideInInspector]
     public static GameObject lastSelectedObject = null;
 
@@ -33,21 +40,17 @@ public class GameObjectsManager : MonoBehaviour {
             bool needToSaveChild = false;
             switch (go.name)
             {
-                case "Player": data += "player:"; needToSaveChild = true; break;
-                case "Finish": data += "finish:"; needToSaveChild = true; break;
-                case "Do not fall here!": data += "fall:"; break;
+                case "Player": needToSaveChild = true; break;
+                case "Finish": needToSaveChild = true; break;
             }
 
+            data += go.name;
             data += SaveGameObjectData(go);
 
             if (needToSaveChild)
             {
                 GameObject child = go.transform.GetChild(0).gameObject;
-                switch (go.name)
-                {
-                    case "Player(Top)": data += "playerTop:"; break;
-                    case "Finish(Top)": data += "finishTop:"; break;
-                }
+                data += child.name;
                 data += SaveGameObjectData(child);
             }
         }
@@ -63,7 +66,7 @@ public class GameObjectsManager : MonoBehaviour {
                go.transform.rotation.ToString() +
                go.transform.localScale.ToString() +
                go.GetComponent<Renderer>().material.color.ToString() +
-               ";";
+               "\r\n";
     }
 
     private string GenerateUniqueID()
@@ -75,6 +78,92 @@ public class GameObjectsManager : MonoBehaviour {
     {
         itemPath = itemPath.Replace(@"/", @"\");
         System.Diagnostics.Process.Start("explorer.exe", "/select," + itemPath);
+    }
+
+    public void LoadLevel()
+    {
+        string path = Application.persistentDataPath + "/level.txt";
+
+        if (System.IO.File.Exists(path))
+        {
+            string data = System.IO.File.ReadAllText(path);
+            string[] objects = data.Split(new string[] { "\r\n" }, StringSplitOptions.RemoveEmptyEntries);
+
+            char[] delims = "(),".ToCharArray();
+            foreach (string obj in objects)
+            {
+                string[] objInfoParts = obj.Split(delims, StringSplitOptions.RemoveEmptyEntries);
+
+                foreach (string dat in objInfoParts)
+                {
+                    Debug.Log(dat);
+                }
+
+                try
+                {
+                    switch (objInfoParts[0])
+                    {
+                        case "Player":
+                            ParseObject(objInfoParts, player);
+                            break;
+                        case "Player[Top]":
+                            ParseObject(objInfoParts, playerTop);
+                            break;
+                        case "Finish":
+                            ParseObject(objInfoParts, finish);
+                            break;
+                        case "Finish[Top]":
+                            ParseObject(objInfoParts, finishTop);
+                            break;
+                        case "Do not fall here!":
+                            ParseObject(objInfoParts, fall);
+                            break;
+                        default:
+                            ParseObject(objInfoParts);
+                            break;
+                    }
+                }
+                catch (Exception e)
+                {
+                    objectNameText.text = "ERROR: Level data corrupted.\nSome parts may be missing.";
+                }
+            }
+        }
+        else
+        {
+            string readmePath = Application.persistentDataPath + "/README.txt";
+            System.IO.File.WriteAllText(readmePath, "Please put your level in this folder with name:\r\n\r\nlevel.txt\r\nand click Load again.");
+            ShowExplorer(readmePath);
+        }
+    }
+
+    private void ParseObject(string[] data)
+    {
+        Vector3 position = new Vector3(float.Parse(data[1]), float.Parse(data[2]), float.Parse(data[3]));
+        Vector4 rotation = new Vector4(float.Parse(data[4]), float.Parse(data[5]), float.Parse(data[6]), float.Parse(data[7]));
+        Vector3 scale    = new Vector3(float.Parse(data[8]), float.Parse(data[9]), float.Parse(data[10]));
+        Color color = new Color(float.Parse(data[12]), float.Parse(data[13]), float.Parse(data[14]));
+
+        PrimitiveType parsed_enum = (PrimitiveType) Enum.Parse(typeof(PrimitiveType), data[0]);
+        GameObject newObject = GameObject.CreatePrimitive(parsed_enum);
+
+        newObject.transform.position = position;
+        newObject.transform.rotation = Quaternion.Euler(rotation);
+        newObject.transform.localScale = scale;
+        newObject.GetComponent<Renderer>().material.color = color;
+    }
+
+    private void ParseObject(string[] data, GameObject dest)
+    {
+        Vector3 position = new Vector3(float.Parse(data[1]), float.Parse(data[2]), float.Parse(data[3]));
+        Vector4 rotation = new Vector4(float.Parse(data[4]), float.Parse(data[5]), float.Parse(data[6]), float.Parse(data[7]));
+        Vector3 scale = new Vector3(float.Parse(data[8]), float.Parse(data[9]), float.Parse(data[10]));
+        Color color = new Color(float.Parse(data[12]), float.Parse(data[13]), float.Parse(data[14]));
+
+        dest.transform.position = position;
+        dest.transform.rotation = Quaternion.Euler(rotation);
+        dest.transform.localScale = scale;
+        dest.GetComponent<Renderer>().material.color = color;
     }
 
     public void DeleteCurrent()
