@@ -63,7 +63,7 @@ public class GameObjectsManager : MonoBehaviour {
     private string SaveGameObjectData(GameObject go)
     {
         return go.transform.position.ToString() +
-               go.transform.rotation.ToString() +
+               go.transform.rotation.eulerAngles.ToString() +
                go.transform.localScale.ToString() +
                go.GetComponent<Renderer>().material.color.ToString() +
                "\r\n";
@@ -93,11 +93,6 @@ public class GameObjectsManager : MonoBehaviour {
             foreach (string obj in objects)
             {
                 string[] objInfoParts = obj.Split(delims, StringSplitOptions.RemoveEmptyEntries);
-
-                foreach (string dat in objInfoParts)
-                {
-                    Debug.Log(dat);
-                }
 
                 try
                 {
@@ -132,7 +127,7 @@ public class GameObjectsManager : MonoBehaviour {
         else
         {
             string readmePath = Application.persistentDataPath + "/README.txt";
-            System.IO.File.WriteAllText(readmePath, "Please put your level in this folder with name:\r\n\r\nlevel.txt\r\nand click Load again.");
+            System.IO.File.WriteAllText(readmePath, "Please put your level in this folder with name:\r\n\r\nlevel.txt\r\n\r\nand click Load again.");
             ShowExplorer(readmePath);
         }
     }
@@ -140,9 +135,9 @@ public class GameObjectsManager : MonoBehaviour {
     private void ParseObject(string[] data)
     {
         Vector3 position = new Vector3(float.Parse(data[1]), float.Parse(data[2]), float.Parse(data[3]));
-        Vector4 rotation = new Vector4(float.Parse(data[4]), float.Parse(data[5]), float.Parse(data[6]), float.Parse(data[7]));
-        Vector3 scale    = new Vector3(float.Parse(data[8]), float.Parse(data[9]), float.Parse(data[10]));
-        Color color = new Color(float.Parse(data[12]), float.Parse(data[13]), float.Parse(data[14]));
+        Vector3 rotation = new Vector3(float.Parse(data[4]), float.Parse(data[5]), float.Parse(data[6]));
+        Vector3 scale    = new Vector3(float.Parse(data[7]), float.Parse(data[8]), float.Parse(data[9]));
+        Color color = new Color(float.Parse(data[11]), float.Parse(data[12]), float.Parse(data[13]));
 
         PrimitiveType parsed_enum = (PrimitiveType) Enum.Parse(typeof(PrimitiveType), data[0]);
         GameObject newObject = GameObject.CreatePrimitive(parsed_enum);
@@ -156,9 +151,9 @@ public class GameObjectsManager : MonoBehaviour {
     private void ParseObject(string[] data, GameObject dest)
     {
         Vector3 position = new Vector3(float.Parse(data[1]), float.Parse(data[2]), float.Parse(data[3]));
-        Vector4 rotation = new Vector4(float.Parse(data[4]), float.Parse(data[5]), float.Parse(data[6]), float.Parse(data[7]));
-        Vector3 scale = new Vector3(float.Parse(data[8]), float.Parse(data[9]), float.Parse(data[10]));
-        Color color = new Color(float.Parse(data[12]), float.Parse(data[13]), float.Parse(data[14]));
+        Vector3 rotation = new Vector3(float.Parse(data[4]), float.Parse(data[5]), float.Parse(data[6]));
+        Vector3 scale = new Vector3(float.Parse(data[7]), float.Parse(data[8]), float.Parse(data[9]));
+        Color color = new Color(float.Parse(data[11]), float.Parse(data[12]), float.Parse(data[13]));
 
         dest.transform.position = position;
         dest.transform.rotation = Quaternion.Euler(rotation);

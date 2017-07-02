@@ -153,6 +153,7 @@ public class ObjectPropertiesEditor : MonoBehaviour {
 
     public void SetColor(Image color)
     {
+        notificationText.text = "3D GAME MAKER";
         current.GetComponent<Renderer>().material.color = color.color;
     }
 

@@ -23,8 +23,10 @@ public class SpawnPrimitiveOnClick : MonoBehaviour {
         GameObject last = GameObjectsManager.lastSelectedObject;
         if (last != null)
         {
-            newObject.transform.position = last.transform.position + new Vector3(2, 0, 0);
+            newObject.transform.position = last.transform.position + new Vector3(1, 0, 0);
             newObject.transform.rotation = last.transform.rotation;
+            newObject.transform.localScale = last.transform.localScale;
+            newObject.GetComponent<Renderer>().material.color = last.GetComponent<Renderer>().material.color;
         }
 
         GameObjectsManager.lastSelectedObject = newObject;
