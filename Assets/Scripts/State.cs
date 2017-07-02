@@ -1,10 +1,12 @@
 ﻿using System.Collections;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class State : MonoBehaviour {
 
-    [Header("Player")]
+    [Header("Objects & UI")]
     public GameObject player;
+    public Text playStopButtonText;
 
     [Header("UI Stuff")]
     public GameObject[] uiStuffToHideWhenPlaying;
@@ -25,6 +27,8 @@ public class State : MonoBehaviour {
 
         if (isPlaying)
         {
+            playStopButtonText.color = Color.red;
+
             player.SetActive(false);
 
             playerClone = Instantiate(player, player.transform.position, player.transform.rotation, player.transform.parent);
@@ -45,6 +49,8 @@ public class State : MonoBehaviour {
         }
         else
         {
+            playStopButtonText.color = Color.black;
+
             Destroy(playerClone);
             player.SetActive(true);
 

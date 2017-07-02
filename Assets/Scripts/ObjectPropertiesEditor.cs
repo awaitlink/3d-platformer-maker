@@ -5,36 +5,28 @@ using System;
 public class ObjectPropertiesEditor : MonoBehaviour {
 
     [Header("Position")]
-    public InputField posX;
-    public InputField posY;
-    public InputField posZ;
-
+    public InputField[] pos;
     [Header("Rotation")]
-    public InputField rotX;
-    public InputField rotY;
-    public InputField rotZ;
-
+    public InputField[] rot;
     [Header("Scale")]
-    public InputField scaX;
-    public InputField scaY;
-    public InputField scaZ;
+    public InputField[] sca;
+
+    private InputField[][] inputs;
 
     private GameObject last;
     private GameObject current;
 
     void Start()
     {
-        posX.onEndEdit.AddListener(delegate { ApplyValues(); });
-        posY.onEndEdit.AddListener(delegate { ApplyValues(); });
-        posZ.onEndEdit.AddListener(delegate { ApplyValues(); });
+        inputs = new InputField[][] { pos, rot, sca };
 
-        rotX.onEndEdit.AddListener(delegate { ApplyValues(); });
-        rotY.onEndEdit.AddListener(delegate { ApplyValues(); });
-        rotZ.onEndEdit.AddListener(delegate { ApplyValues(); });
-
-        scaX.onEndEdit.AddListener(delegate { ApplyValues(); });
-        scaY.onEndEdit.AddListener(delegate { ApplyValues(); });
-        scaZ.onEndEdit.AddListener(delegate { ApplyValues(); });
+        foreach (InputField[] inputArray in inputs)
+        {
+            foreach (InputField input in inputArray)
+            {
+                input.onEndEdit.AddListener(delegate { ApplyValues(); });
+            }
+        }
     }
 
     void Update()
@@ -52,17 +44,21 @@ public class ObjectPropertiesEditor : MonoBehaviour {
     {
         if (current != null)
         {
-            posX.text = current.transform.position.x.ToString();
-            posY.text = current.transform.position.y.ToString();
-            posZ.text = current.transform.position.z.ToString();
 
-            rotX.text = current.transform.rotation.eulerAngles.x.ToString();
-            rotY.text = current.transform.rotation.eulerAngles.y.ToString();
-            rotZ.text = current.transform.rotation.eulerAngles.z.ToString();
-
-            scaX.text = current.transform.localScale.x.ToString();
-            scaY.text = current.transform.localScale.y.ToString();
-            scaZ.text = current.transform.localScale.z.ToString();
+            for (int i = 0; i < inputs.Length; i++)
+            {
+                for (int j = 0; j < 3; j++)
+                {
+                    Vector3 param = Vector3.zero;
+                    switch (i)
+                    {
+                        case 0: param = current.transform.position; break;
+                        case 1: param = current.transform.rotation.eulerAngles; break;
+                        case 2: param = current.transform.localScale; break;
+                    }
+                    inputs[i][j].text = param[j].ToString();
+                }
+            }
         }
     }
 
@@ -70,6 +66,7 @@ public class ObjectPropertiesEditor : MonoBehaviour {
     {
         if (current != null)
         {
+            //TODO: Optimize methods:
             ApplyPosition();
             ApplyRotation();
             ApplyScale();
@@ -82,19 +79,19 @@ public class ObjectPropertiesEditor : MonoBehaviour {
 
         try
         {
-            pX = float.Parse(posX.text);
+            pX = float.Parse(inputs[0][0].text);
         }
         catch (Exception e) { pX = current.transform.position.x; }
 
         try
         {
-            pY = float.Parse(posY.text);
+            pY = float.Parse(inputs[0][1].text);
         }
         catch (Exception e) { pY = current.transform.position.y; }
 
         try
         {
-            pZ = float.Parse(posZ.text);
+            pZ = float.Parse(inputs[0][2].text);
         }
         catch (Exception e) { pZ = current.transform.position.z; }
 
@@ -107,19 +104,19 @@ public class ObjectPropertiesEditor : MonoBehaviour {
 
         try
         {
-            rX = float.Parse(rotX.text);
+            rX = float.Parse(inputs[1][0].text);
         }
         catch (Exception e) { rX = current.transform.rotation.eulerAngles.x; }
 
         try
         {
-            rY = float.Parse(rotY.text);
+            rY = float.Parse(inputs[1][1].text);
         }
         catch (Exception e) { rY = current.transform.rotation.eulerAngles.y; }
 
         try
         {
-            rZ = float.Parse(rotZ.text);
+            rZ = float.Parse(inputs[1][2].text);
         }
         catch (Exception e) { rZ = current.transform.rotation.eulerAngles.z; }
 
@@ -132,23 +129,28 @@ public class ObjectPropertiesEditor : MonoBehaviour {
 
         try
         {
-            sX = float.Parse(scaX.text);
+            sX = float.Parse(inputs[2][0].text);
         }
         catch (Exception e) { sX = current.transform.localScale.x; }
 
         try
         {
-            sY = float.Parse(scaY.text);
+            sY = float.Parse(inputs[2][1].text);
         }
         catch (Exception e) { sY = current.transform.localScale.y; }
 
         try
         {
-            sZ = float.Parse(scaZ.text);
+            sZ = float.Parse(inputs[2][2].text);
         }
         catch (Exception e) { sZ = current.transform.localScale.z; }
 
         current.transform.localScale = new Vector3(sX, sY, sZ);
+    }
+
+    public void SetColor(Image color)
+    {
+        current.GetComponent<Renderer>().material.color = color.color;
     }
 
 }

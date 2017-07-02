@@ -14,7 +14,7 @@ public class GameObjectsManager : MonoBehaviour {
 
     public void DeleteCurrent()
     {
-        if (lastSelectedObject.transform.parent.name != "DontDelete")
+        if (lastSelectedObject != null && !lastSelectedObject.tag.Equals("DontDelete"))
         {
             Destroy(lastSelectedObject);
             lastSelectedObject = null;
