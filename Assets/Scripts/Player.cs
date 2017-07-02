@@ -5,13 +5,14 @@ public class Player : MonoBehaviour {
     public float speed = 5f;
     public float jumpSpeed = 10f;
 
-    private bool jumpAvailable = true;
+    private float distToGround;
 
     private Rigidbody rb;
 
     void Start()
     {
         rb = GetComponent<Rigidbody>();
+        distToGround = GetComponent<Collider>().bounds.extents.y;
     }
 
 	void Update()
@@ -22,19 +23,17 @@ public class Player : MonoBehaviour {
             float z = Input.GetAxis("Vertical");
 
             float y = 0f;
-            if (Input.GetKeyDown(KeyCode.Space) && jumpAvailable)
+            if (Input.GetKeyDown(KeyCode.Space) && IsGrounded())
             {
                 y = jumpSpeed;
-                jumpAvailable = false;
             }
 
             rb.velocity = new Vector3(x * speed, rb.velocity.y + y, z * speed);
         }
     }
 
-    void OnCollisionEnter(Collision col)
-    {
-        jumpAvailable = true;
-    }
+    private bool IsGrounded(){
+        return Physics.Raycast(transform.position, -Vector3.up, distToGround + 0.1f);
+    } 
 
 }

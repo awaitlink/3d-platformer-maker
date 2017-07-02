@@ -4,6 +4,8 @@ using System;
 
 public class ObjectPropertiesEditor : MonoBehaviour {
 
+    public Text notificationText;
+
     [Header("Position")]
     public InputField[] pos;
     [Header("Rotation")]
@@ -66,6 +68,7 @@ public class ObjectPropertiesEditor : MonoBehaviour {
     {
         if (current != null)
         {
+            notificationText.text = "3D GAME MAKER";
             //TODO: Optimize methods:
             ApplyPosition();
             ApplyRotation();

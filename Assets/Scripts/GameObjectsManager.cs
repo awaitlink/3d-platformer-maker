@@ -1,7 +1,11 @@
 ﻿using UnityEngine;
+using UnityEngine.UI;
 
 public class GameObjectsManager : MonoBehaviour {
 
+    public Text objectNameText;
+
+    [HideInInspector]
     public static GameObject lastSelectedObject = null;
 
     void Update()
@@ -9,6 +13,7 @@ public class GameObjectsManager : MonoBehaviour {
         if (Input.GetMouseButtonDown(0) && !UnityEngine.EventSystems.EventSystem.current.IsPointerOverGameObject())
         {
             lastSelectedObject = GetSelectedObject();
+            objectNameText.text = lastSelectedObject.name;
         }
     }
 

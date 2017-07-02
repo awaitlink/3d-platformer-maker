@@ -3,6 +3,7 @@ using UnityEngine;
 
 public class SpawnPrimitiveOnClick : MonoBehaviour {
 
+    public Text objectNameText;
     public PrimitiveType spawnedPrimitiveType;
     public Transform parent;
 
@@ -27,6 +28,7 @@ public class SpawnPrimitiveOnClick : MonoBehaviour {
         }
 
         GameObjectsManager.lastSelectedObject = newObject;
+        objectNameText.text = newObject.name;
     }
 
 }

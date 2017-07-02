@@ -4,8 +4,12 @@ using UnityEngine.UI;
 
 public class State : MonoBehaviour {
 
+    [HideInInspector]
+    public static State instance;
+
     [Header("Objects & UI")]
     public GameObject player;
+    public Text objectNameText;
     public Text playStopButtonText;
 
     [Header("UI Stuff")]
@@ -16,9 +20,22 @@ public class State : MonoBehaviour {
     [HideInInspector]
     public static bool isPlaying = false;
 
+    void Awake()
+    {
+        if (instance == null)
+        {
+            instance = this;
+        }
+        else if (instance != this)
+        {
+            Destroy(gameObject);
+        }
+    }
+
     void Start()
     {
         GameObjectsManager.lastSelectedObject = player;
+        objectNameText.text = player.name;
     }
 
     public void ChangeGameState()
@@ -55,6 +72,7 @@ public class State : MonoBehaviour {
             player.SetActive(true);
 
             GameObjectsManager.lastSelectedObject = player;
+            objectNameText.text = player.name;
 
             foreach (GameObject toHide in uiStuffToHideWhenPlaying)
             {
