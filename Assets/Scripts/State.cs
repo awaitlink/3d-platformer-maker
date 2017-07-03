@@ -13,7 +13,8 @@ public class State : MonoBehaviour {
     public Text playStopButtonText;
 
     [Header("UI Stuff")]
-    public GameObject[] uiStuffToHideWhenPlaying;
+    public GameObject[] uiStuffToHideWhenPlayingLeft;
+    public GameObject[] uiStuffToHideWhenPlayingRight;
 
     private GameObject playerClone = null;
 
@@ -55,9 +56,13 @@ public class State : MonoBehaviour {
             playerCloneRB.useGravity = true;
 
 
-            foreach (GameObject toHide in uiStuffToHideWhenPlaying)
+            foreach (GameObject toHide in uiStuffToHideWhenPlayingLeft)
             {
                 StartCoroutine(MoveGO(toHide.transform, new Vector2(-2, -2), 40));
+            }
+            foreach (GameObject toHide in uiStuffToHideWhenPlayingRight)
+            {
+                StartCoroutine(MoveGO(toHide.transform, new Vector2(2, 2), 40));
             }
 
             playerClone.SetActive(true);
@@ -74,9 +79,13 @@ public class State : MonoBehaviour {
             GameObjectsManager.lastSelectedObject = player;
             objectNameText.text = player.name;
 
-            foreach (GameObject toHide in uiStuffToHideWhenPlaying)
+            foreach (GameObject toHide in uiStuffToHideWhenPlayingLeft)
             {
                 StartCoroutine(MoveGO(toHide.transform, new Vector2(2, 2), 40));
+            }
+            foreach (GameObject toHide in uiStuffToHideWhenPlayingRight)
+            {
+                StartCoroutine(MoveGO(toHide.transform, new Vector2(-2, -2), 40));
             }
         }
     }

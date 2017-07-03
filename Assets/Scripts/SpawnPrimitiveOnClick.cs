@@ -1,8 +1,15 @@
 ﻿using UnityEngine.UI;
 using UnityEngine;
+using System;
 
 public class SpawnPrimitiveOnClick : MonoBehaviour {
 
+    [Header("UI Offset Inputs")]
+    public InputField X;
+    public InputField Y;
+    public InputField Z;
+
+    [Header("Other")]
     public Text objectNameText;
     public PrimitiveType spawnedPrimitiveType;
     public Transform parent;
@@ -23,7 +30,13 @@ public class SpawnPrimitiveOnClick : MonoBehaviour {
         GameObject last = GameObjectsManager.lastSelectedObject;
         if (last != null)
         {
-            newObject.transform.position = last.transform.position + new Vector3(1, 0, 0);
+            float x = 1, y = 0, z = 0;
+
+            try { x = float.Parse(X.text); } catch (Exception e) { }
+            try { y = float.Parse(Y.text); } catch (Exception e) { }
+            try { z = float.Parse(Z.text); } catch (Exception e) { }
+
+            newObject.transform.position = last.transform.position + new Vector3(x, y, z);
             newObject.transform.rotation = last.transform.rotation;
             newObject.transform.localScale = last.transform.localScale;
             newObject.GetComponent<Renderer>().material.color = last.GetComponent<Renderer>().material.color;

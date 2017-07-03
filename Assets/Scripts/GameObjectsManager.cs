@@ -2,10 +2,17 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using System.IO;
 
 public class GameObjectsManager : MonoBehaviour {
 
+    [Header("UI Elements")]
     public Text objectNameText;
+    public Button deleteButton;
+    public GameObject saveUI;
+    public InputField saveUIInputField;
+    public GameObject loadUI;
+    public GameObject loadUIContent;
 
     [Header("Base Objects")]
     public GameObject player;
@@ -16,6 +23,17 @@ public class GameObjectsManager : MonoBehaviour {
 
     [HideInInspector]
     public static GameObject lastSelectedObject = null;
+    [HideInInspector]
+    public static bool isSaveShown = false;
+
+    private GameObject elementPrefab;
+
+    void Start()
+    {
+        saveUI.SetActive(false);
+        loadUI.SetActive(false);
+        elementPrefab = Resources.Load<GameObject>("Element");
+    }
 
     void Update()
     {
@@ -24,40 +42,77 @@ public class GameObjectsManager : MonoBehaviour {
             lastSelectedObject = GetSelectedObject();
             objectNameText.text = lastSelectedObject.name;
         }
+
+        if (IsDeletionAvailable())
+        {
+            deleteButton.gameObject.SetActive(true);
+        }
+        else
+        {
+            deleteButton.gameObject.SetActive(false);
+        }
+    }
+
+    public void CloseSaveUI()
+    {
+        saveUI.SetActive(false);
+        isSaveShown = false;
+    }
+
+    public void PrepareForSaving()
+    {
+        saveUI.SetActive(true);
+        isSaveShown = true;
     }
 
     public void SaveLevel()
     {
-        List<GameObject> children = new List<GameObject>();
-        for (int i = 0; i < transform.childCount; i++)
-        {
-            children.Add(transform.GetChild(i).gameObject);
-        }
+        string fileName = saveUIInputField.text;
+        string path = Application.persistentDataPath + "/" + fileName + ".3pm";
 
-        string data = "";
-        foreach (GameObject go in children)
+        bool isValid = !string.IsNullOrEmpty(fileName) &&
+              fileName.IndexOfAny(Path.GetInvalidFileNameChars()) < 0 &&
+              !File.Exists(path);
+
+        if (isValid)
         {
-            bool needToSaveChild = false;
-            switch (go.name)
+            saveUI.SetActive(false);
+            isSaveShown = false;
+
+            List<GameObject> children = new List<GameObject>();
+            for (int i = 0; i < transform.childCount; i++)
             {
-                case "Player": needToSaveChild = true; break;
-                case "Finish": needToSaveChild = true; break;
+                children.Add(transform.GetChild(i).gameObject);
             }
 
-            data += go.name;
-            data += SaveGameObjectData(go);
-
-            if (needToSaveChild)
+            string data = "";
+            foreach (GameObject go in children)
             {
-                GameObject child = go.transform.GetChild(0).gameObject;
-                data += child.name;
-                data += SaveGameObjectData(child);
-            }
-        }
+                bool needToSaveChild = false;
+                switch (go.name)
+                {
+                    case "Player": needToSaveChild = true; break;
+                    case "Finish": needToSaveChild = true; break;
+                }
 
-        string path = Application.persistentDataPath + "/level_" + GenerateUniqueID() + ".txt";
-        System.IO.File.WriteAllText(path, data);
-        ShowExplorer(path);
+                data += go.name;
+                data += SaveGameObjectData(go);
+
+                if (needToSaveChild)
+                {
+                    GameObject child = go.transform.GetChild(0).gameObject;
+                    data += child.name;
+                    data += SaveGameObjectData(child);
+                }
+            }
+
+            File.WriteAllText(path, data);
+            ShowExplorer(path);
+        }
+        else
+        {
+            NotificationSystem.instance.ShowNotification("Filename is not valid, or file already exists. Please choose another one.");
+        }
     }
 
     private string SaveGameObjectData(GameObject go)
@@ -80,56 +135,84 @@ public class GameObjectsManager : MonoBehaviour {
         System.Diagnostics.Process.Start("explorer.exe", "/select," + itemPath);
     }
 
-    public void LoadLevel()
+    public void CloseLoadUI()
     {
-        string path = Application.persistentDataPath + "/level.txt";
+        loadUI.SetActive(false);
+    }
 
-        if (System.IO.File.Exists(path))
+    public void PrepareForLoading()
+    {
+        for (int i = 0; i < loadUIContent.transform.childCount; i++)
         {
-            string data = System.IO.File.ReadAllText(path);
-            string[] objects = data.Split(new string[] { "\r\n" }, StringSplitOptions.RemoveEmptyEntries);
+            GameObject element = loadUIContent.transform.GetChild(i).gameObject;
+            Destroy(element);
+        }
 
-            char[] delims = "(),".ToCharArray();
-            foreach (string obj in objects)
+        string[] levels = Directory.GetFiles(Application.persistentDataPath + "/", "*.3pm");
+        foreach (string fileName in levels)
+        {
+            GameObject newElement = Instantiate(elementPrefab, loadUIContent.transform);
+            newElement.GetComponentInChildren<Text>().text = fileName.Replace(".3pm", "").Replace(Application.persistentDataPath + "/", "");
+
+            Button newElementButton = newElement.GetComponent<Button>();
+            newElementButton.onClick.AddListener(delegate { LoadLevel(newElementButton); });
+        }
+
+        loadUI.SetActive(true);
+    }
+
+    public void LoadLevel(Button b)
+    {
+        loadUI.SetActive(false);
+
+        for (int i = 0; i < transform.childCount; i++)
+        {
+            GameObject element = transform.GetChild(i).gameObject;
+            if (!element.tag.Equals("DontDelete"))
             {
-                string[] objInfoParts = obj.Split(delims, StringSplitOptions.RemoveEmptyEntries);
-
-                try
-                {
-                    switch (objInfoParts[0])
-                    {
-                        case "Player":
-                            ParseObject(objInfoParts, player);
-                            break;
-                        case "Player[Top]":
-                            ParseObject(objInfoParts, playerTop);
-                            break;
-                        case "Finish":
-                            ParseObject(objInfoParts, finish);
-                            break;
-                        case "Finish[Top]":
-                            ParseObject(objInfoParts, finishTop);
-                            break;
-                        case "Do not fall here!":
-                            ParseObject(objInfoParts, fall);
-                            break;
-                        default:
-                            ParseObject(objInfoParts);
-                            break;
-                    }
-                }
-                catch (Exception e)
-                {
-                    objectNameText.text = "ERROR: Level data corrupted.\nSome parts may be missing.";
-                }
+                Destroy(element);
             }
         }
-        else
+
+        string path = Application.persistentDataPath + "/" + b.GetComponentInChildren<Text>().text + ".3pm";
+        string data = File.ReadAllText(path);
+        string[] objects = data.Split(new string[] { "\r\n" }, StringSplitOptions.RemoveEmptyEntries);
+        char[] delims = "(),".ToCharArray();
+        foreach (string obj in objects)
         {
-            string readmePath = Application.persistentDataPath + "/README.txt";
-            System.IO.File.WriteAllText(readmePath, "Please put your level in this folder with name:\r\n\r\nlevel.txt\r\n\r\nand click Load again.");
-            ShowExplorer(readmePath);
+            string[] objInfoParts = obj.Split(delims, StringSplitOptions.RemoveEmptyEntries);
+
+            try
+            {
+                switch (objInfoParts[0])
+                {
+                    case "Player":
+                        ParseObject(objInfoParts, player);
+                        break;
+                    case "Player[Top]":
+                        ParseObject(objInfoParts, playerTop);
+                        break;
+                    case "Finish":
+                        ParseObject(objInfoParts, finish);
+                        break;
+                    case "Finish[Top]":
+                        ParseObject(objInfoParts, finishTop);
+                        break;
+                    case "Do not fall here!":
+                        ParseObject(objInfoParts, fall);
+                        break;
+                    default:
+                        ParseObject(objInfoParts);
+                        break;
+                }
+            }
+            catch (Exception e)
+            {
+                NotificationSystem.instance.ShowNotification("ERROR: Level data corrupted.\nSome parts may be missing.");
+            }
         }
+        lastSelectedObject = player;
+        objectNameText.text = player.name;
     }
 
     private void ParseObject(string[] data)
@@ -142,6 +225,7 @@ public class GameObjectsManager : MonoBehaviour {
         PrimitiveType parsed_enum = (PrimitiveType) Enum.Parse(typeof(PrimitiveType), data[0]);
         GameObject newObject = GameObject.CreatePrimitive(parsed_enum);
 
+        newObject.transform.parent = gameObject.transform;
         newObject.transform.position = position;
         newObject.transform.rotation = Quaternion.Euler(rotation);
         newObject.transform.localScale = scale;
@@ -163,11 +247,16 @@ public class GameObjectsManager : MonoBehaviour {
 
     public void DeleteCurrent()
     {
-        if (lastSelectedObject != null && !lastSelectedObject.tag.Equals("DontDelete"))
+        if (IsDeletionAvailable())
         {
             Destroy(lastSelectedObject);
             lastSelectedObject = null;
         }
+    }
+
+    private bool IsDeletionAvailable()
+    {
+        return lastSelectedObject != null && !lastSelectedObject.tag.Equals("DontDelete");
     }
 
     GameObject GetSelectedObject()

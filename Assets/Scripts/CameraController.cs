@@ -24,7 +24,7 @@ public class CameraController : MonoBehaviour {
 
             transform.LookAt(target);
         }
-        else
+        else if (!GameObjectsManager.isSaveShown)
         {
             float x = Input.GetAxis("Horizontal");
             float y = Input.GetAxis("Vertical");

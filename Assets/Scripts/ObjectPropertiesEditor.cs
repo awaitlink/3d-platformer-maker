@@ -68,7 +68,7 @@ public class ObjectPropertiesEditor : MonoBehaviour {
     {
         if (current != null)
         {
-            notificationText.text = "3D GAME MAKER";
+            NotificationSystem.instance.CloseNotification();
             //TODO: Optimize methods:
             ApplyPosition();
             ApplyRotation();
@@ -153,7 +153,7 @@ public class ObjectPropertiesEditor : MonoBehaviour {
 
     public void SetColor(Image color)
     {
-        notificationText.text = "3D GAME MAKER";
+        NotificationSystem.instance.CloseNotification();
         current.GetComponent<Renderer>().material.color = color.color;
     }
 
