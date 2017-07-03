@@ -259,7 +259,7 @@ public class GameObjectsManager : MonoBehaviour {
         return lastSelectedObject != null && !lastSelectedObject.tag.Equals("DontDelete");
     }
 
-    GameObject GetSelectedObject()
+    private GameObject GetSelectedObject()
     {
         Ray interactionRay = Camera.main.ScreenPointToRay(Input.mousePosition);
         RaycastHit interactionInfo;
@@ -268,6 +268,26 @@ public class GameObjectsManager : MonoBehaviour {
             return interactionInfo.collider.gameObject;
         }
         return lastSelectedObject;
+    }
+
+    public void SwitchBetweenObjectAndTop()
+    {
+        GameObject[][] pairs = new GameObject[][]
+        {
+            new GameObject[] { player, playerTop },
+            new GameObject[] { finish, finishTop }
+        };
+
+        foreach (GameObject[] pair in pairs)
+        {
+            if (Equals(pair[0], lastSelectedObject))
+                lastSelectedObject = pair[1];
+
+            else if (Equals(pair[1], lastSelectedObject))
+                lastSelectedObject = pair[0];
+        }
+
+        objectNameText.text = lastSelectedObject.name;
     }
 
 }
