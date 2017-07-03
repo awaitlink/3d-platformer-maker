@@ -39,6 +39,14 @@ public class State : MonoBehaviour {
         objectNameText.text = player.name;
     }
 
+    void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            Application.Quit();
+        }
+    }
+
     public void ChangeGameState()
     {
         isPlaying = !isPlaying;
