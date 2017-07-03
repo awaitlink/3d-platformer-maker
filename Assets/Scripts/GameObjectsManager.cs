@@ -47,7 +47,14 @@ public class GameObjectsManager : MonoBehaviour {
         if (IsDeletionAvailable())
         {
             deleteButton.gameObject.SetActive(true);
-            spawnToggle.gameObject.SetActive(true);
+            if (lastSelectedObject.name != "Quad" && lastSelectedObject.name != "Plane")
+            {
+                spawnToggle.gameObject.SetActive(true);
+            }
+            else
+            {
+                spawnToggle.gameObject.SetActive(false);
+            }
         }
         else
         {

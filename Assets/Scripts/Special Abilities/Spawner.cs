@@ -18,17 +18,22 @@ public class Spawner : MonoBehaviour {
                 GameObject newObj = GameObject.CreatePrimitive(type);
                 newObj.transform.parent = transform;
                 newObj.transform.position = transform.position;
-                newObj.transform.rotation = transform.rotation;
                 newObj.GetComponent<Renderer>().material.color = GetComponent<Renderer>().material.color;
                 newObj.AddComponent<Rigidbody>();
             }
         }
         else
         {
+            timePassed = 0f;
             for (int i = 0; i < transform.childCount; i++)
             {
                 Destroy(transform.GetChild(i).gameObject);
             }
+        }
+
+        if (isSpawning && (type == PrimitiveType.Quad || type == PrimitiveType.Plane))
+        {
+            isSpawning = false;
         }
     }
 

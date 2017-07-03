@@ -41,8 +41,14 @@ public class SpawnPrimitiveOnClick : MonoBehaviour {
             newObject.transform.localScale = last.transform.localScale;
             newObject.GetComponent<Renderer>().material.color = last.GetComponent<Renderer>().material.color;
 
-            newObject.AddComponent<Spawner>();
-            newObject.GetComponent<Spawner>().type = spawnedPrimitiveType;
+            Spawner newObjectSpawner = newObject.AddComponent<Spawner>();
+            newObjectSpawner.type = spawnedPrimitiveType;
+
+            Spawner lastSpawner = GameObjectsManager.lastSelectedObject.GetComponent<Spawner>();
+            if (lastSpawner != null)
+            {
+                newObjectSpawner.isSpawning = lastSpawner.isSpawning;
+            }
         }
 
         GameObjectsManager.lastSelectedObject = newObject;
