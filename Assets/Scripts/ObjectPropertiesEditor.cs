@@ -4,7 +4,8 @@ using System;
 
 public class ObjectPropertiesEditor : MonoBehaviour {
 
-    public Text notificationText;
+    [Header("Spawner")]
+    public Toggle spawnToggle;
 
     [Header("Position")]
     public InputField[] pos;
@@ -29,6 +30,8 @@ public class ObjectPropertiesEditor : MonoBehaviour {
                 input.onEndEdit.AddListener(delegate { ApplyValues(); });
             }
         }
+
+        spawnToggle.onValueChanged.AddListener(delegate { ApplySpawn(); });
     }
 
     void Update()
@@ -60,6 +63,12 @@ public class ObjectPropertiesEditor : MonoBehaviour {
                     }
                     inputs[i][j].text = param[j].ToString();
                 }
+            }
+
+            Spawner spawner = current.GetComponent<Spawner>();
+            if (spawner != null)
+            {
+                spawnToggle.isOn = spawner.isSpawning;
             }
         }
     }
@@ -155,6 +164,16 @@ public class ObjectPropertiesEditor : MonoBehaviour {
     {
         NotificationSystem.instance.CloseNotification();
         current.GetComponent<Renderer>().material.color = color.color;
+    }
+
+    public void ApplySpawn()
+    {
+        Spawner spawner = GameObjectsManager.lastSelectedObject.GetComponent<Spawner>();
+
+        if (spawner != null)
+        {
+            spawner.isSpawning = spawnToggle.isOn;
+        }
     }
 
 }

@@ -9,6 +9,7 @@ public class GameObjectsManager : MonoBehaviour {
     [Header("UI Elements")]
     public Text objectNameText;
     public Button deleteButton;
+    public GameObject spawnToggle;
     public GameObject saveUI;
     public InputField saveUIInputField;
     public GameObject loadUI;
@@ -46,10 +47,12 @@ public class GameObjectsManager : MonoBehaviour {
         if (IsDeletionAvailable())
         {
             deleteButton.gameObject.SetActive(true);
+            spawnToggle.gameObject.SetActive(true);
         }
         else
         {
             deleteButton.gameObject.SetActive(false);
+            spawnToggle.gameObject.SetActive(false);
         }
     }
 
@@ -117,11 +120,23 @@ public class GameObjectsManager : MonoBehaviour {
 
     private string SaveGameObjectData(GameObject go)
     {
-        return go.transform.position.ToString() +
+        Spawner s = go.GetComponent<Spawner>();
+
+        string data = "";
+
+        data += go.transform.position.ToString() +
                go.transform.rotation.eulerAngles.ToString() +
                go.transform.localScale.ToString() +
-               go.GetComponent<Renderer>().material.color.ToString() +
-               "\r\n";
+               go.GetComponent<Renderer>().material.color.ToString();
+
+        if (s != null)
+        {
+            data += go.GetComponent<Spawner>().isSpawning.ToString();
+        }
+
+        data += "\r\n";
+
+        return data;
     }
 
     private string GenerateUniqueID()
@@ -230,6 +245,10 @@ public class GameObjectsManager : MonoBehaviour {
         newObject.transform.rotation = Quaternion.Euler(rotation);
         newObject.transform.localScale = scale;
         newObject.GetComponent<Renderer>().material.color = color;
+
+        Spawner ns = newObject.AddComponent<Spawner>();
+        ns.isSpawning = bool.Parse(data[15]);
+        ns.type = parsed_enum;
     }
 
     private void ParseObject(string[] data, GameObject dest)

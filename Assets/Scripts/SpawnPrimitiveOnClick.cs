@@ -40,6 +40,9 @@ public class SpawnPrimitiveOnClick : MonoBehaviour {
             newObject.transform.rotation = last.transform.rotation;
             newObject.transform.localScale = last.transform.localScale;
             newObject.GetComponent<Renderer>().material.color = last.GetComponent<Renderer>().material.color;
+
+            newObject.AddComponent<Spawner>();
+            newObject.GetComponent<Spawner>().type = spawnedPrimitiveType;
         }
 
         GameObjectsManager.lastSelectedObject = newObject;
