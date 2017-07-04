@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using System.Collections;
 
 public class Spawner : MonoBehaviour {
 
@@ -22,6 +23,9 @@ public class Spawner : MonoBehaviour {
                 newObj.transform.position = transform.position;
                 newObj.GetComponent<Renderer>().material.color = GetComponent<Renderer>().material.color;
                 newObj.AddComponent<Rigidbody>();
+
+                newObj.transform.localScale = Vector3.zero;
+                StartCoroutine(ScaleUp(newObj.transform));
             }
 
             if (transform.childCount > MAX_SPAWNED_OBJECTS)
@@ -46,6 +50,18 @@ public class Spawner : MonoBehaviour {
         if (isSpawning && (type == PrimitiveType.Quad || type == PrimitiveType.Plane))
         {
             isSpawning = false;
+        }
+    }
+
+    private IEnumerator ScaleUp(Transform t)
+    {
+        for (int i = 0; i <= 50; i++)
+        {
+            if (t != null)
+            {
+                t.localScale += Vector3.one / 50f;
+                yield return new WaitForSeconds(.01f);
+            }
         }
     }
 

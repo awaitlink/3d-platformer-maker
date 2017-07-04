@@ -61,6 +61,21 @@ public class GameObjectsManager : MonoBehaviour {
             deleteButton.gameObject.SetActive(false);
             spawnToggle.gameObject.SetActive(false);
         }
+
+        if (Input.GetKeyDown(KeyCode.Delete) && !State.isPlaying)
+        {
+            DeleteCurrent();
+        }
+
+        if (Input.GetKeyDown(KeyCode.S) && (Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl)) && !State.isPlaying)
+        {
+            PrepareForSaving();
+        }
+
+        if (Input.GetKeyDown(KeyCode.O) && (Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl)) && !State.isPlaying)
+        {
+            PrepareForLoading();
+        }
     }
 
     public void CloseSaveUI()
@@ -278,7 +293,8 @@ public class GameObjectsManager : MonoBehaviour {
         if (IsDeletionAvailable())
         {
             Destroy(lastSelectedObject);
-            lastSelectedObject = null;
+            lastSelectedObject = player;
+            objectNameText.text = player.name;
         }
     }
 

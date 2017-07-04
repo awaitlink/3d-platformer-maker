@@ -42,9 +42,14 @@ public class State : MonoBehaviour {
 
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.Escape) && Input.GetKey(KeyCode.LeftShift))
+        if (Input.GetKeyDown(KeyCode.Escape) && (Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift)))
         {
             Application.Quit();
+        }
+
+        if (Input.GetKeyDown(KeyCode.F5))
+        {
+            ChangeGameState();
         }
     }
 
