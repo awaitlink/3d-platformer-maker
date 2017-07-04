@@ -253,6 +253,8 @@ public class GameObjectsManager : MonoBehaviour {
         newObject.transform.localScale = scale;
         newObject.GetComponent<Renderer>().material.color = color;
 
+        newObject.AddComponent<Rigidbody>().isKinematic = true;
+
         Spawner ns = newObject.AddComponent<Spawner>();
         ns.isSpawning = bool.Parse(data[15]);
         ns.type = parsed_enum;

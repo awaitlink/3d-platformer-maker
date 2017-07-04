@@ -4,6 +4,9 @@ using System;
 
 public class SpawnPrimitiveOnClick : MonoBehaviour {
 
+    [Header("UI Multiply Input")]
+    public InputField times;
+
     [Header("UI Offset Inputs")]
     public InputField X;
     public InputField Y;
@@ -21,6 +24,16 @@ public class SpawnPrimitiveOnClick : MonoBehaviour {
     }
 
 	public void OnClick()
+    {
+        int x;
+        int.TryParse(times.text, out x);
+        for (int i = 0; i < x; i++)
+        {
+            SpawnPrimitive();
+        }
+    }
+
+    private void SpawnPrimitive()
     {
         GameObject newObject = GameObject.CreatePrimitive(spawnedPrimitiveType);
 
@@ -40,6 +53,8 @@ public class SpawnPrimitiveOnClick : MonoBehaviour {
             newObject.transform.rotation = last.transform.rotation;
             newObject.transform.localScale = last.transform.localScale;
             newObject.GetComponent<Renderer>().material.color = last.GetComponent<Renderer>().material.color;
+
+            newObject.AddComponent<Rigidbody>().isKinematic = true;
 
             Spawner newObjectSpawner = newObject.AddComponent<Spawner>();
             newObjectSpawner.type = spawnedPrimitiveType;
