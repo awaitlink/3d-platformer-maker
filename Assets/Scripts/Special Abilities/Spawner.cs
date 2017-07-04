@@ -2,6 +2,8 @@
 
 public class Spawner : MonoBehaviour {
 
+    public static int MAX_SPAWNED_OBJECTS = 10;
+
     public PrimitiveType type;
     public bool isSpawning;
 
@@ -20,6 +22,16 @@ public class Spawner : MonoBehaviour {
                 newObj.transform.position = transform.position;
                 newObj.GetComponent<Renderer>().material.color = GetComponent<Renderer>().material.color;
                 newObj.AddComponent<Rigidbody>();
+            }
+
+            if (transform.childCount > MAX_SPAWNED_OBJECTS)
+            {
+                Transform c = transform.GetChild(0);
+                c.localScale -= Vector3.one * Time.deltaTime;
+                if (c.localScale.x <= 0f)
+                {
+                    Destroy(c.gameObject);
+                }
             }
         }
         else

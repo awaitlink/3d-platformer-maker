@@ -11,6 +11,7 @@ public class State : MonoBehaviour {
     public GameObject player;
     public Text objectNameText;
     public Text playStopButtonText;
+    public Text appName;
 
     [Header("UI Stuff")]
     public GameObject[] uiStuffToHideWhenPlayingLeft;
@@ -41,7 +42,7 @@ public class State : MonoBehaviour {
 
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.Escape))
+        if (Input.GetKeyDown(KeyCode.Escape) && Input.GetKey(KeyCode.LeftShift))
         {
             Application.Quit();
         }
@@ -53,48 +54,60 @@ public class State : MonoBehaviour {
 
         if (isPlaying)
         {
-            playStopButtonText.color = Color.red;
-
-            player.SetActive(false);
-
-            playerClone = Instantiate(player, player.transform.position, player.transform.rotation, player.transform.parent);
-            playerClone.transform.localScale = player.transform.localScale;
-            Rigidbody playerCloneRB = playerClone.GetComponent<Rigidbody>();
-            playerCloneRB.isKinematic = false;
-            playerCloneRB.useGravity = true;
-
-
-            foreach (GameObject toHide in uiStuffToHideWhenPlayingLeft)
-            {
-                StartCoroutine(MoveGO(toHide.transform, new Vector2(-2, -2), 40));
-            }
-            foreach (GameObject toHide in uiStuffToHideWhenPlayingRight)
-            {
-                StartCoroutine(MoveGO(toHide.transform, new Vector2(2, 2), 40));
-            }
-
-            playerClone.SetActive(true);
-
-            CameraController.target = playerClone.transform;
+            Play();
         }
         else
         {
-            playStopButtonText.color = Color.black;
+            Edit();
+        }
+    }
 
-            Destroy(playerClone);
-            player.SetActive(true);
+    private void Play()
+    {
+        appName.color = Color.black;
+        playStopButtonText.color = Color.red;
 
-            GameObjectsManager.lastSelectedObject = player;
-            objectNameText.text = player.name;
+        player.SetActive(false);
 
-            foreach (GameObject toHide in uiStuffToHideWhenPlayingLeft)
-            {
-                StartCoroutine(MoveGO(toHide.transform, new Vector2(2, 2), 40));
-            }
-            foreach (GameObject toHide in uiStuffToHideWhenPlayingRight)
-            {
-                StartCoroutine(MoveGO(toHide.transform, new Vector2(-2, -2), 40));
-            }
+        playerClone = Instantiate(player, player.transform.position, player.transform.rotation, player.transform.parent);
+        playerClone.transform.localScale = player.transform.localScale;
+        Rigidbody playerCloneRB = playerClone.GetComponent<Rigidbody>();
+        playerCloneRB.isKinematic = false;
+        playerCloneRB.useGravity = true;
+
+
+        foreach (GameObject toHide in uiStuffToHideWhenPlayingLeft)
+        {
+            StartCoroutine(MoveGO(toHide.transform, new Vector2(-2, -2), 40));
+        }
+        foreach (GameObject toHide in uiStuffToHideWhenPlayingRight)
+        {
+            StartCoroutine(MoveGO(toHide.transform, new Vector2(2, 2), 40));
+        }
+
+        playerClone.SetActive(true);
+
+        CameraController.target = playerClone.transform;
+    }
+
+    private void Edit()
+    {
+        appName.color = Color.white;
+        playStopButtonText.color = Color.white;
+
+        Destroy(playerClone);
+        player.SetActive(true);
+
+        GameObjectsManager.lastSelectedObject = player;
+        objectNameText.text = player.name;
+
+        foreach (GameObject toHide in uiStuffToHideWhenPlayingLeft)
+        {
+            StartCoroutine(MoveGO(toHide.transform, new Vector2(2, 2), 40));
+        }
+        foreach (GameObject toHide in uiStuffToHideWhenPlayingRight)
+        {
+            StartCoroutine(MoveGO(toHide.transform, new Vector2(-2, -2), 40));
         }
     }
 
